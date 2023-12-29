@@ -5,14 +5,9 @@
 #include "state.h"
 #include "capture.h"
 
-char expr[] = " ?.+ ";
+char expr[] = ".";
 
-char value[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
-"sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim"
-"ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex"
-"ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit"
-"esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat"
-"non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+char value[4096] = {0};
 
 void cap(int a, int b)
 {
@@ -30,50 +25,17 @@ int main(void)
 	}
 	expression_print(&e);
 
-	/*
-	token_avl_tree_node_t *t = token_avl_tree_node_gen(e.token_vector[0], 0);
-
-	for(size_t i = 1; i < e.token_vector_size; i++)
-	{
-		token_avl_tree_node_insert(&t, e.token_vector[i], i);
-	}
-
-	for(size_t i = 0; i < e.token_vector_size; i++)
-	{
-		if(i == (size_t)token_avl_tree_find(t, e.token_vector[i]))
-			printf("PASSING %ld!\n", i);
-		else
-			printf("FAILING %ld!\n", i);
-	}
-
-	token_avl_tree_print(t, 0);
-	*/
-
-	/*
-	transitions_t t = {0};
-
-	for(size_t i = 0; i < e.token_vector_size; i++)
-		transition_emplace(&t, e.token_vector[i], i);
-
-	token_avl_tree_print(t.token_state_map, 0);
-
-	for(size_t i = 0; i < e.token_vector_size; i++)
-	{
-		if(i == (size_t)transition_fetch(&t, e.token_vector[i]))
-			printf("PASSING %ld!\n", i);
-		else
-			printf("FAILING %ld!\n", i);
-	}
-
-	transition_delete(&t);
-	*/
+	FILE *f = fopen("test.txt", "rb+");
+	// the size of the test file for now is 3643 byes so it fits
+	fread(value, sizeof value, 1, f);
+	fclose(f);
 
 	state_machine_t s = {0};
 	state_machine_gen(&s, &e);
 
 	state_machine_print(&s);
 
-	capture_find_all(&s, cap, value, sizeof value);
+	capture_find_all(&s, cap, value, 3683);
 
 	return 0;
 }

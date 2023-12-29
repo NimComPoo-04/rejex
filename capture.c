@@ -16,7 +16,8 @@ static int relative_finder(state_machine_t *s,
 	token_t any = {.type = ANY,    .value = '.'};
 	token_t end = {.type = END,    .value = 0};
 
-	for(int i = 0; i < len; i++)
+	int i = 0;
+	while(i < len)
 	{
 		si = i;
 		ei = i;
@@ -25,25 +26,36 @@ static int relative_finder(state_machine_t *s,
 		while(current_sate != -1 && current_sate != -2 && ei < len)
 		{
 			val.value = str[ei++];
-			int k = transition_fetch(&s->states.states_vector[current_sate].next_state, val);
+
+			if(val.value == '\n' || val.value == '\r')
+				val.type = NEWLINE;
+			else
+				val.type = NORMAL;
+
+			int k = transition_fetch(&s->states.states_vector[current_sate].next_state,
+					val);
 
 			if(k == -1)
-				k = transition_fetch(&s->states.states_vector[current_sate].next_state, any);
+				k = transition_fetch(&s->states.states_vector[current_sate].next_state,
+						any);
 
 			if(k == -1)
-				k = transition_fetch(&s->states.states_vector[current_sate].next_state, end); 
+				k = transition_fetch(&s->states.states_vector[current_sate].next_state,
+						end); 
 
 			current_sate = k;
 		}
 
 		if(current_sate == -2)
 		{
-			ei--; // releasing the one collected by end
+			ei--;
+			i = ei;
 			func(si, ei);
-			i = ei - (si != ei);
 			if(quit)
 				return 1;
 		}
+		else
+			i++;
 	}
 
 	return 0;

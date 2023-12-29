@@ -11,6 +11,7 @@ enum
 	ANY,
 	NEWLINE,
 	CONTROL,
+	INTERNAL,
 };
 
 typedef struct
